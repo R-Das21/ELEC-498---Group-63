@@ -1,0 +1,33 @@
+Queries:
+Abstract 0:
+"What are the cognitive needs of museum visitors and the content parameters required to design engaging interactive kiosk software for museums?"
+
+Abstract 1:
+"How can the spectrum and coherency of action potential sequences be estimated and statistically analyzed despite finite sample sizes?"
+
+Abstract 2:
+"What are the functional performance differences between eye control and single switch scanning access methods for people with ALS?"
+
+Abstract 3:
+"What roles do P2X receptors play as ATP sensors in both normal and pathological conditions?"
+
+Abstract 4:
+"How can run-time constant propagation improve functional density in software systems?"
+
+Abstract 5:
+"How can improved species identification practices enhance sustainable forest management in the Brazilian Amazon?"
+
+Abstract 6:
+"How do local feedback mechanisms contribute to the variability in climate sensitivity across different GCM ensembles?"
+
+Abstract 7:
+"Under what conditions do time-delayed recurrent loops of spiking neurons exhibit multistability?"
+
+Abstract 8:
+"What are the defining linguistic and structural characteristics of the Finnish (Finno-Ugric) language?"
+
+Abstract 9:
+"How can a non-slip boundary condition be effectively implemented in lattice Boltzmann simulations?"
+
+Abstract 10:
+"What are the applications of forest parameters derived from satellite and inventory data using the k-NN algorithm in various ecological and planning contexts?"
