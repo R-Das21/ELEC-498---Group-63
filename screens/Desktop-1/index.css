@@ -1,0 +1,100 @@
+.box {
+	height: 64px;
+	align-self: stretch;
+	background: linear-gradient(180deg, #1E004BCC, #0F32BDCC);
+	border: 1px solid #5E27FD;
+	margin-bottom: 30px;
+}
+.box2 {
+	flex: 1;
+	align-self: stretch;
+}
+.column {
+	align-self: stretch;
+	display: flex;
+	flex-direction: column;
+	background: #F6F6F6;
+	border: 1px solid #AEACAC;
+	padding-top: 163px;
+	padding-bottom: 453px;
+	box-shadow: 0px 4px 4px #00000040;
+}
+.contain {
+	display: flex;
+	flex-direction: column;
+	background: #FFFFFF;
+}
+.image {
+	width: 70px;
+	height: 61px;
+	margin-right: 6px;
+	object-fit: fill;
+}
+.image2 {
+	width: 82px;
+	height: 82px;
+	object-fit: fill;
+}
+.input {
+	color: #000000;
+	font-size: 30px;
+	flex: 1;
+	align-self: stretch;
+	background: none;
+	border: none;
+	padding-top: 12px;
+	padding-bottom: 12px;
+}
+.row-view {
+	align-self: stretch;
+	display: flex;
+	align-items: center;
+	margin-bottom: 20px;
+	margin-left: 23px;
+	margin-right: 39px;
+}
+.row-view2 {
+	align-self: stretch;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background: #FFFFFF;
+	border-radius: 30px;
+	padding-left: 43px;
+	padding-right: 43px;
+	margin-left: 104px;
+}
+.scroll-view {
+	height: 1024px;
+	align-self: stretch;
+	background: #FFFFFF;
+	padding-top: 1px;
+}
+.text {
+	font-size: 35px;
+}
+.text2 {
+	color: #000000;
+	font-size: 25px;
+	margin-right: 76px;
+}
+.text3 {
+	color: #000000;
+	font-size: 25px;
+	margin-right: 63px;
+}
+.text4 {
+	color: #000000;
+	font-size: 25px;
+	margin-right: 69px;
+}
+.text5 {
+	color: #000000;
+	font-size: 25px;
+}
+.text6 {
+	color: #000000;
+	font-size: 40px;
+	text-align: center;
+	margin-bottom: 95px;
+}
