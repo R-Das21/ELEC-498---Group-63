@@ -7,6 +7,7 @@ function App() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showResults, setShowResults] = useState(false); // ✅ 用于控制 UI 变化
 
   const handleSearch = async () => {
     if (query.trim() === "") {
@@ -16,6 +17,7 @@ function App() {
     setErrorMessage("");
     setLoading(true);
     setResults([]);
+    setShowResults(true); // ✅ 触发 UI 变化
 
     try {
       const response = await fetch("http://localhost:3001/api/gpt", {
@@ -33,7 +35,7 @@ function App() {
             author: paper.Author,
             year: paper.Year,
             abstract: paper.Abstract,
-            relevance: `${paper.RelevanceScore}/100` // ✅ 显示相关性评分
+            relevance: `${paper.RelevanceScore}/100`
           })));
         } else {
           setErrorMessage("No valid papers found. Try another search term.");
@@ -58,8 +60,8 @@ function App() {
         </div>
       </header>
 
-      <main className="main">
-        <h2 className="prompt">What would you like to discover today?</h2>
+      <main className={`main ${showResults ? "search-active" : ""}`}>
+        {!showResults && <h2 className="prompt">What would you like to discover today?</h2>}
 
         <div className="search-container">
           <input
@@ -77,22 +79,24 @@ function App() {
         {loading && <div className="spinner"></div>}
 
         {!loading && results.length > 0 && (
-          <table className="results-table">
-            <thead>
-              <tr><th>Title</th><th>Author</th><th>Year</th><th>Abstract</th><th>Relevance</th></tr>
-            </thead>
-            <tbody>
-              {results.map((paper, idx) => (
-                <tr key={idx}>
-                  <td>{paper.title}</td>
-                  <td>{paper.author}</td>
-                  <td>{paper.year}</td>
-                  <td>{paper.abstract}</td>
-                  <td className="relevance-score">{paper.relevance}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="results-container">
+            <table className="results-table">
+              <thead>
+                <tr><th>Title</th><th>Author</th><th>Year</th><th>Abstract</th><th>Relevance</th></tr>
+              </thead>
+              <tbody>
+                {results.map((paper, idx) => (
+                  <tr key={idx}>
+                    <td>{paper.title}</td>
+                    <td>{paper.author}</td>
+                    <td>{paper.year}</td>
+                    <td>{paper.abstract}</td>
+                    <td className="relevance-score">{paper.relevance}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </main>
     </div>
