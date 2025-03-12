@@ -1,4 +1,4 @@
-/* 通用样式 */
+/* ======== 全局基础样式 ======== */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -7,23 +7,30 @@ body {
 }
 
 .container {
-  max-width: 90%;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 20px;
+  padding: 0px;
 }
 
+/* ======== Header部分 (蓝色横幅) ======== */
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+
   padding: 15px 30px;
   border-bottom: 1px solid #ddd;
-  background: linear-gradient(to right, rgba(30, 0, 75, 0.9), rgba(15, 50, 190, 0.9));
+  background: linear-gradient(
+    to right,
+    rgba(30, 0, 75, 0.9),
+    rgba(15, 50, 190, 0.9)
+  );
   color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
 }
 
+/* Logo文字 */
 .logo {
   font-size: 28px;
   font-weight: bold;
@@ -34,7 +41,7 @@ body {
   color: #ffe580;
 }
 
-/* Logo 容器优化 */
+/* Logo容器 */
 .logo-container {
   display: flex;
   align-items: center;
@@ -42,6 +49,7 @@ body {
   padding: 1px 10px;
 }
 
+/* Logo图像 */
 .logo-img {
   height: 45px;
   width: auto;
@@ -51,63 +59,30 @@ body {
   filter: invert(1);
 }
 
-/* ========== 搜索界面布局 ========== */
-/* 主体样式 */
-.main {/* 通用样式 */
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
+/* ======== Filter下拉菜单所在的行 ======== */
+.filter-row {
+  /* 与Header分开的一行，背景可与body相同 */
   background-color: #f8f9fa;
+  padding: 15px 30px; /* 与header保持类似左右留白 */
 }
 
-.container {
-  max-width: 90%;
-  margin: 0 auto;
-  padding: 20px;
+/* 下拉菜单样式 */
+.filter-dropdown {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1.5px solid #ddd;
+  border-radius: 6px;
+  background-color: white;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.3s;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 30px;
-  border-bottom: 1px solid #ddd;
-  background: linear-gradient(to right, rgba(30, 0, 75, 0.9), rgba(15, 50, 190, 0.9));
-  color: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(10px);
+.filter-dropdown:focus {
+  border-color: #2a72d8;
 }
 
-.logo {
-  font-size: 28px;
-  font-weight: bold;
-  color: white;
-}
-
-.highlight {
-  color: #ffe580;
-}
-
-/* Logo 容器优化 */
-.logo-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 1px 10px;
-}
-
-.logo-img {
-  height: 45px;
-  width: auto;
-  border-radius: 8px;
-  box-shadow: none;
-  background-color: transparent;
-  filter: invert(1);
-}
-
-/* ========== 搜索界面布局 ========== */
-/* 主体样式 */
+/* ======== Main部分 & 搜索界面布局 ======== */
 .main {
   display: flex;
   flex-direction: column;
@@ -119,23 +94,36 @@ body {
   transition: all 0.5s ease-in-out;
 }
 
-
 /* 搜索后，搜索栏上移 */
 .search-active {
   justify-content: flex-start;
   height: auto;
-  padding-top: 60px;
-}
-.search-container {
-  display: flex;
-  align-items: center;  /* ✅ 保持按钮和搜索框的垂直居中 */
-  justify-content: center; /* ✅ 确保搜索栏和按钮整体居中 */
-  width: 130%;
-  max-width: 800px; /* ✅ 限制搜索栏最大宽度，避免过长 */
-  margin: 0 auto;
-  gap: 15px; /* ✅ 保持按钮和搜索框的间距固定 */
+  padding-top: 1px;
 }
 
+/* 问候语（搜索后隐藏） */
+.prompt {
+  font-family: "Arial", sans-serif;
+  font-size: 35px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.search-active .prompt {
+  display: none;
+}
+
+/* 搜索栏容器 */
+.search-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 130%;
+  max-width: 900px;
+  margin: 0 auto;
+  gap: 10px;
+  position: relative;
+}
 
 /* 输入框 */
 .search-input {
@@ -148,9 +136,28 @@ body {
   min-width: 250px;
 }
 
-/* 聚焦时搜索框颜色 */
 .search-input:focus {
   border-color: #2a72d8;
+}
+
+/* 清除按钮 (X) */
+.clear-button {
+  width: 35px;
+  height: 35px;
+  border: none;
+  background-color: transparent;
+  color: #999;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: color 0.2s ease-in-out;
+}
+
+.clear-button:hover {
+  color: #333;
 }
 
 /* 搜索按钮 */
@@ -175,22 +182,19 @@ body {
   color: white;
 }
 
-/* 问候语（搜索后隐藏） */
-
-
-/* 搜索后隐藏问候语 */
-.search-active .prompt {
-  display: none;
+/* 错误提示信息 */
+.error-message {
+  color: red;
+  margin-top: 10px;
 }
 
-/* ==========  搜索结果 ========== */
+/* ======== 搜索结果 ======== */
 .results-container {
   width: 80vw;
   max-width: 1300px;
   margin-top: 30px;
 }
 
-/* 搜索结果表格 */
 .results-table {
   width: 100%;
   border-collapse: collapse;
@@ -224,171 +228,46 @@ td {
   vertical-align: middle;
 }
 
-/* 提示消息、加载动画、错误信息 */
-.error-message {
-  color: red;
-  margin-top: 10px;
+/* ======== 加载动画 ======== */
+#loading-container {
+  position: fixed; /* 或者 absolute，看你想不想覆盖全屏 */
+  width: 200px;
+  height: 200px;
+  margin: auto;
+  transform: rotate(45deg);
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999; /* 保证它在最上方 */
 }
 
-/* 加载动画 */
-.spinner {
-  display: block;
-  margin: 20px auto;
-  width: 50px;
-  height: 50px;
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid #5DADE2;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+/* 🔥 搜索历史下拉框 */
+.history-dropdown {
+  position: absolute;
+  top: 45px; /* 让下拉框紧贴输入框 */
+  left: 0;
+  width: calc(100% - 10px);
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  padding: 5px 0;
+  list-style: none;
+  z-index: 10;
+  text-align: left; /* ✅ 让搜索历史左对齐 */
 }
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 50vh;
-  text-align: center;
-  width: 100%;
-  transition: all 0.5s ease-in-out;
-}
-
-
-/* 搜索后，搜索栏上移 */
-.search-active {
-  justify-content: flex-start;
-  height: auto;
-  padding-top: 60px;
-}
-.search-container {
-  display: flex;
-  align-items: center;  /* ✅ 保持按钮和搜索框的垂直居中 */
-  justify-content: center; /* ✅ 确保搜索栏和按钮整体居中 */
-  width: 130%;
-  max-width: 800px; /* ✅ 限制搜索栏最大宽度，避免过长 */
-  margin: 0 auto;
-  gap: 15px; /* ✅ 保持按钮和搜索框的间距固定 */
-}
-
-
-/* 输入框 */
-.search-input {
-  flex: 1;
-  padding: 13px 20px;
-  font-size: 16px;
-  border: 1.5px solid #ddd;
-  border-radius: 30px;
-  outline: none;
-  min-width: 250px;
-}
-
-/* 聚焦时搜索框颜色 */
-.search-input:focus {
-  border-color: #2a72d8;
-}
-
-/* 搜索按钮 */
-.search-button {
-  width: 45px;
-  height: 45px;
-  border: none;
-  background-color: #fff;
-  color: #333;
-  border-radius: 50%;
-  font-size: 18px;
+/* 🔥 历史搜索项 */
+.history-item {
+  padding: 10px 15px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.3s ease;
+  font-size: 14px;
+  color: #333;
+  transition: background 0.2s;
+  text-align: left; /* ✅ 确保文本左对齐 */
 }
 
-.search-button:hover {
-  background-color: #333;
-  color: white;
-}
-
-/* 问候语（搜索后隐藏） */
-
-
-/* 搜索后隐藏问候语 */
-.search-active .prompt {
-  display: none;
-}
-
-/* ==========  搜索结果 ========== */
-.results-container {
-  width: 80vw;
-  max-width: 1000px;
-  margin-top: 30px;
-}
-
-/* 搜索结果表格 */
-.results-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-.results-table th,
-.results-table td {
-  border: 1px solid #ddd;
-  padding: 12px;
-  text-align: left;
-  background: white;
-}
-
-.results-table th {
-  background-color: #f2f2f2;
-  font-weight: bold;
-  text-align: center;
-}
-
-/* 让 Relevance Score 居中 */
-.relevance-score {
-  font-weight: bold;
-  color: #2a72d8;
-  text-align: center;
-}
-
-/* 提高可读性 */
-td {
-  text-align: left;
-  vertical-align: middle;
-}
-
-/* 提示消息、加载动画、错误信息 */
-.error-message {
-  color: red;
-  margin-top: 10px;
-}
-
-/* 加载动画 */
-.spinner {
-  display: block;
-  margin: 20px auto;
-  width: 50px;
-  height: 50px;
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid #5DADE2;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+.history-item:hover {
+  background: #f2f2f2;
 }
