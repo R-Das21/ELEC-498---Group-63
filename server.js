@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const OpenAI = require("openai");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
 const PORT = 3001;
@@ -18,15 +20,25 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// 让 OpenAI 返回 10 篇最佳论文，并带有相关性评分
+// 从 Topic_Net.json 加载本地分类数据（正确的相对路径）
+let topicNetData = {};
+try {
+  const topicNetPath = path.join(__dirname, "..", "Topic_Net.json");
+  const topicNetContent = fs.readFileSync(topicNetPath, "utf8");
+  topicNetData = JSON.parse(topicNetContent);
+  console.log("✅ Loaded Topic_Net.json successfully from:", topicNetPath);
+} catch (error) {
+  console.error("❌ Error loading Topic_Net.json:", error);
+}
+
 app.post("/api/gpt", async (req, res) => {
   try {
-    const { prompt } = req.body;
+    const { prompt, field } = req.body;
     if (!prompt) {
       return res.status(400).json({ error: "❌ No prompt provided." });
     }
 
-    console.log(`🔍 Received prompt: "${prompt}"`);
+    console.log(`🔍 Received prompt: "${prompt}", field: "${field || "All Fields"}"`);
 
     // 🔥 让 GPT 返回 10 篇论文，并提供相关性评分
     const gptPrompt = `
@@ -55,23 +67,38 @@ app.post("/api/gpt", async (req, res) => {
 
     // ✅ 让 OpenAI 只返回 JSON 格式的文本
     let jsonText = completion.choices[0].message.content.trim();
+    console.log("📝 OpenAI JSON Response:", jsonText);
 
-    console.log("📝 OpenAI JSON Response:", jsonText); // 记录 OpenAI 返回的内容
+    jsonText = jsonText.replace(/(\r\n|\n|\r)/gm, "").trim();
+    jsonText = jsonText.replace(/,\s*}/g, "}");
+    jsonText = jsonText.replace(/,\s*]/g, "]");
 
-    // ✅ 先尝试修正 JSON 格式错误（去除额外字符）
-    jsonText = jsonText.replace(/(\r\n|\n|\r)/gm, "").trim(); // 去除换行符
-    jsonText = jsonText.replace(/,\s*}/g, "}"); // 修正逗号+大括号错误
-    jsonText = jsonText.replace(/,\s*]/g, "]"); // 修正逗号+方括号错误
-
-    // ✅ 解析 OpenAI 返回的 JSON 数据
     const papers = JSON.parse(jsonText);
 
-    // 发送 JSON 数据给前端
+    // 当接收到 field 参数且不为 "All Fields" 时，进行本地分类筛选
+    if (field && field.trim() !== "" && field !== "All Fields") {
+      console.log(`📂 Filtering papers for field: "${field}" using Topic_Net data`);
+      // 使用 Topic_Net.json 中的数据来匹配论文标题或摘要
+      let filtered = papers.papers.filter((paper) =>
+        topicNetData[field]?.some(keyword =>
+          (paper.Title || "").toLowerCase().includes(keyword.toLowerCase()) ||
+          (paper.Abstract || "").toLowerCase().includes(keyword.toLowerCase())
+        )
+      );
+      // 如果筛选后的结果不足 10 篇，则用剩余论文补足
+      if (filtered.length < 10) {
+        const needed = 10 - filtered.length;
+        const unmatched = papers.papers.filter(p => !filtered.includes(p));
+        const supplement = unmatched.slice(0, needed);
+        filtered = [...filtered, ...supplement];
+      }
+      papers.papers = filtered;
+    }
+
     res.json(papers);
   } catch (error) {
     console.error("❌ OpenAI API Error:", error);
 
-    // ❌ 处理 JSON 解析错误
     if (error instanceof SyntaxError) {
       return res.status(500).json({
         error: "Invalid JSON format received from OpenAI. Try again.",
