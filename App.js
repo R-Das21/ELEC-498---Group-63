@@ -12,20 +12,18 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showResults, setShowResults] = useState(false);
-  const [selectedField, setSelectedField] = useState("");   // 学科筛选状态
+  const [selectedField, setSelectedField] = useState("All Fields");
   const [history, setHistory] = useState([]);  // 存储搜索历史
   const [showHistory, setShowHistory] = useState(false);  // 控制历史记录的显示
 
-
   // 当 selectedField 或 originalResults 改变时，进行二次过滤
   useEffect(() => {
-    if (!selectedField) {
-      // 如果未选学科，则直接显示所有原始结果
+    // 如果选的是 "All Fields"，就直接显示所有原始结果
+    if (selectedField === "All Fields") {
       setResults(originalResults);
     } else {
-      // 取出 Topic_Net.json 中对应学科的论文ID列表
+      // 根据 Topic_Net.json 中的paper_id进行过滤
       const validPaperIds = topicNet[selectedField]?.papers || [];
-      // 过滤：只保留那些 paper_id 存在于 validPaperIds 中的论文
       const filtered = originalResults.filter(paper =>
         validPaperIds.includes(paper.paper_id)
       );
@@ -38,52 +36,59 @@ function App() {
   };
 
   const handleSearch = async () => {
+    console.log("handleSearch triggered with query =", query);
+
     if (query.trim() === "") {
-      setErrorMessage("Oops, it looks like you didn't type anything. Please enter some keywords!");
+      console.log("Query is empty, returning...");
+      setErrorMessage("Oops...");
       return;
     }
+
+    console.log("Query is not empty, continuing...");
     setErrorMessage("");
     setLoading(true);
     setShowResults(true);
-    setOriginalResults([]); // 清空原始结果
-    setShowHistory(false);  // 关闭历史记录
+    setOriginalResults([]);
+    setShowHistory(false);
 
-    // ✅ 存储搜索历史（不存重复项）
+    console.log("About to call setHistory...");
     setHistory(prevHistory => {
+      console.log("Inside setHistory callback, prevHistory =", prevHistory);
       const newHistory = prevHistory.includes(query) ? prevHistory : [...prevHistory, query];
-      return newHistory.slice(-5); // 只存 5 条最新记录
-  });
+      return newHistory.slice(-5);
+    });
+
+    console.log("Set history done, about to fetch...");
 
     try {
-      // 向后端发请求进行全领域搜索
       const response = await fetch("http://localhost:3001/api/gpt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: query
-          // 此处只传递 prompt，后端返回全领域结果
-        }),
+        body: JSON.stringify({ prompt: query, field: selectedField }),
       });
+      console.log("fetch response status =", response.status);
 
       const data = await response.json();
+      console.log("前端拿到的数据 =", data);
 
       if (response.ok) {
+        // 确保 data.papers 存在并是数组
         if (data.papers && Array.isArray(data.papers)) {
-          // 假设每篇论文数据中包含一个 paper_id 字段（你可能需要在后端生成或映射它）
           const newPapers = data.papers.map((paper, idx) => ({
-            paper_id: paper.paper_id || `paper_${idx + 1}`,  // 若没有 paper_id，临时生成一个
+            paper_id: paper.paper_id || `paper_${idx + 1}`,
             title: paper.Title,
             author: paper.Author,
             year: paper.Year,
             abstract: paper.Abstract,
             relevance: `${paper.RelevanceScore}/100`,
           }));
+          // 将处理好的论文列表保存到 originalResults
           setOriginalResults(newPapers);
-          // 过滤结果会自动由 useEffect 更新
         } else {
           setErrorMessage("No valid papers found. Try another search term.");
         }
       } else {
+        // 如果响应状态不是 200-299，显示后端返回的错误或"Server error."
         setErrorMessage(data.error || "Server error.");
       }
     } catch (error) {
@@ -113,7 +118,8 @@ function App() {
           value={selectedField}
           onChange={(e) => setSelectedField(e.target.value)}
         >
-          <option value="">All Fields</option>
+          {/* 🔥 把 value 设成 "All Fields" */}
+          <option value="All Fields">All Fields</option>
           <option value="Artificial Intelligence (AI)">Artificial Intelligence (AI)</option>
           <option value="Biology">Biology</option>
           <option value="Chemistry">Chemistry</option>
