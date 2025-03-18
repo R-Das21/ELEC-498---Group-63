@@ -2,27 +2,32 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 import myLogo from "./logoNEW.svg";
 import topicNet from "./Topic_Net.json";
-
-import CustomSpinner from "./loading-animation.js"; // 确保路径正确
+import CustomSpinner from "./loading-animation.js";
+import Login from "./Login"; // Login 组件内包含 “Continue as Guest” 按钮
 
 function App() {
+  // token 为空表示未登录；isGuest 为 true 表示访客模式
+  const [token, setToken] = useState(null);
+  const [isGuest, setIsGuest] = useState(false);
+
   const [query, setQuery] = useState("");
-  const [originalResults, setOriginalResults] = useState([]); // GPT返回的原始结果
-  const [results, setResults] = useState([]);               // 最终显示的结果（经过过滤）
+  const [originalResults, setOriginalResults] = useState([]);
+  const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showResults, setShowResults] = useState(false);
   const [selectedField, setSelectedField] = useState("All Fields");
-  const [history, setHistory] = useState([]);  // 存储搜索历史
-  const [showHistory, setShowHistory] = useState(false);  // 控制历史记录的显示
+  const [history, setHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [accountMenuVisible, setAccountMenuVisible] = useState(false);
+  const [username, setUsername] = useState("");
 
-  // 当 selectedField 或 originalResults 改变时，进行二次过滤
+
+  // 根据选择的领域对搜索结果进行二次过滤
   useEffect(() => {
-    // 如果选的是 "All Fields"，就直接显示所有原始结果
     if (selectedField === "All Fields") {
       setResults(originalResults);
     } else {
-      // 根据 Topic_Net.json 中的paper_id进行过滤
       const validPaperIds = topicNet[selectedField]?.papers || [];
       const filtered = originalResults.filter(paper =>
         validPaperIds.includes(paper.paper_id)
@@ -36,43 +41,37 @@ function App() {
   };
 
   const handleSearch = async () => {
-    console.log("handleSearch triggered with query =", query);
-
     if (query.trim() === "") {
-      console.log("Query is empty, returning...");
       setErrorMessage("Oops...");
       return;
     }
-
-    console.log("Query is not empty, continuing...");
     setErrorMessage("");
     setLoading(true);
     setShowResults(true);
     setOriginalResults([]);
     setShowHistory(false);
 
-    console.log("About to call setHistory...");
+    // 保存最近 5 次搜索记录（仅在前端显示历史）
     setHistory(prevHistory => {
-      console.log("Inside setHistory callback, prevHistory =", prevHistory);
       const newHistory = prevHistory.includes(query) ? prevHistory : [...prevHistory, query];
       return newHistory.slice(-5);
     });
 
-    console.log("Set history done, about to fetch...");
-
     try {
+      const headers = { "Content-Type": "application/json" };
+      // 如果已登录则带上 token；访客模式则不带 Authorization
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
       const response = await fetch("http://localhost:3001/api/gpt", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ prompt: query, field: selectedField }),
       });
-      console.log("fetch response status =", response.status);
 
       const data = await response.json();
-      console.log("前端拿到的数据 =", data);
-
       if (response.ok) {
-        // 确保 data.papers 存在并是数组
         if (data.papers && Array.isArray(data.papers)) {
           const newPapers = data.papers.map((paper, idx) => ({
             paper_id: paper.paper_id || `paper_${idx + 1}`,
@@ -82,26 +81,27 @@ function App() {
             abstract: paper.Abstract,
             relevance: `${paper.RelevanceScore}/100`,
           }));
-          // 将处理好的论文列表保存到 originalResults
           setOriginalResults(newPapers);
         } else {
           setErrorMessage("No valid papers found. Try another search term.");
         }
       } else {
-        // 如果响应状态不是 200-299，显示后端返回的错误或"Server error."
         setErrorMessage(data.error || "Server error.");
       }
     } catch (error) {
-      console.error("Search failed:", error);
       setErrorMessage("Network error or server is not responding.");
     } finally {
       setLoading(false);
     }
   };
 
+  // 若既没有 token 又不是访客，则显示登录界面
+  if (!token && !isGuest) {
+    return <Login onLogin={setToken} onGuest={() => setIsGuest(true)} />;
+  }
+
   return (
     <div className="container">
-      {/* ======== 顶部 Header（蓝色横幅） ======== */}
       <header className="header">
         <div className="logo-container">
           <img src={myLogo} alt="NetSci Logo" className="logo-img" />
@@ -109,16 +109,58 @@ function App() {
             <span className="highlight">Net</span>Sci
           </h1>
         </div>
+        {/* 右上角链接区域 */}
+        <div className="header-links">
+          {token ? (
+            <div className="account-container" style={{ position: "relative" }}>
+              <span
+                className="header-link"
+                onClick={() => setAccountMenuVisible(!accountMenuVisible)}
+                style={{ cursor: "pointer" }}
+              >
+                Account
+
+              </span>
+              {accountMenuVisible && (
+                <div className="account-dropdown">
+
+                  <button
+                      onClick={() => {
+                      setToken(null);
+                      setIsGuest(false);
+                      setAccountMenuVisible(false);
+                    }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <a
+              href="#login"
+              className="header-link"
+              onClick={() => {
+                // 退出访客模式，回到登录页面
+                setIsGuest(false);
+                setToken(null);
+              }}
+            >
+              Login
+            </a>
+          )}
+          <a href="/help.html" target="_blank" className="header-link">
+            Help
+          </a>
+        </div>
       </header>
 
-      {/* ======== 下方 Filter 下拉菜单区域 ======== */}
       <div className="filter-row">
         <select
           className="filter-dropdown"
           value={selectedField}
           onChange={(e) => setSelectedField(e.target.value)}
         >
-          {/* 🔥 把 value 设成 "All Fields" */}
           <option value="All Fields">All Fields</option>
           <option value="Artificial Intelligence (AI)">Artificial Intelligence (AI)</option>
           <option value="Biology">Biology</option>
@@ -135,21 +177,19 @@ function App() {
         </select>
       </div>
 
-      {/* ======== 主体部分 ======== */}
       <main className={`main ${showResults ? "search-active" : ""}`}>
         {!showResults && (
           <h2 className="prompt">What would you like to discover today?</h2>
         )}
 
-        {/* 🔥 搜索框 + 搜索历史 */}
         <div className="search-container">
           <input
             type="text"
             placeholder="Type your keywords here..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => setShowHistory(true)}  // ✅ 聚焦显示历史
-            onBlur={() => setTimeout(() => setShowHistory(false), 200)} // ✅ 失焦后隐藏，延迟防止点击丢失
+            onFocus={() => setShowHistory(true)}
+            onBlur={() => setTimeout(() => setShowHistory(false), 200)}
             onKeyDown={(event) => event.key === "Enter" && handleSearch()}
             className="search-input"
           />
@@ -164,11 +204,14 @@ function App() {
             🔍
           </button>
 
-          {/* 🔥 搜索历史显示在输入框下方 */}
           {showHistory && history.length > 0 && (
             <ul className="history-dropdown">
               {history.map((item, idx) => (
-                <li key={idx} onMouseDown={() => setQuery(item)} className="history-item">
+                <li
+                  key={idx}
+                  onMouseDown={() => setQuery(item)}
+                  className="history-item"
+                >
                   {item}
                 </li>
               ))}
@@ -177,9 +220,7 @@ function App() {
         </div>
 
         {errorMessage && <p className="error-message">{errorMessage}</p>}
-
         {loading && <CustomSpinner />}
-
         {!loading && results.length > 0 && (
           <div className="results-container">
             <table className="results-table">
