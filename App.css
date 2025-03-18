@@ -275,3 +275,60 @@ td {
 .history-item:hover {
   background: #f2f2f2;
 }
+
+/* 右上角链接容器 */
+.header-links {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* 控制链接之间的间距 */
+}
+
+/* 每个链接的样式 */
+.header-link {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: bold;
+  /* 如果想让鼠标悬停时有下划线 */
+  transition: text-decoration 0.2s;
+}
+
+.header-link:hover {
+  text-decoration: underline;
+}
+
+.account-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #fff;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  padding: 10px;
+  z-index: 100;
+  min-width: 150px;
+}
+
+.account-header {
+  font-weight: bold;
+  margin-bottom: 10px;
+  /* 可加边框或下划线区分 */
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+.account-dropdown button {
+  background: transparent;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  padding: 5px 0;
+}
+
+.account-dropdown button:hover {
+  text-decoration: underline;
+}
